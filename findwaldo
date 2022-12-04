@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#Initialize variables
+page=0
+count_stdout=0
+count_stderr=0
+count_fileline=0
+count_filename=0
+
+# in the puzzle, search from page 1 to 99 to find waldo, count lines and record it. This loop does everything all together. First, it saves four variables representing different waldo instances. Second, use an if loop to see if any of the variable not equal to 0. Save the echoed results into one result file and return the result file at the end. 
+for ((i=0;i<100;i++));
+do ./$1 $i 1>stdout 2>stderr  #for each page in the puzzle, export standard output stream to stdout file and standard error stream to stderr file.
+   count_stdout=$(grep -i -wc waldo stdout) # find waldo in stdout and count
+   count_stderr=$(grep -i -wc waldo stderr) # find waldo in stderr and count
+   count_fileline=$(grep -r -i waldo /home/jovyan/ps1b-lixizoe/PuzzleDir/* | wc -l) # find waldo in file lines of PuzzleDir
+   count_filename=$(ls -R /home/jovyan/ps1b-lixizoe/PuzzleDir | grep -i waldo | wc -l) # find waldo in file names of PuzzleDir
+   if [ $count_stdout != 0 ] || [ $count_stderr != 0 ] || [ $count_fileline != 0 ] || [ $count_filename != 0 ];then echo -e "$1 $i $count_stdout $count_stderr $count_fileline $count_filename" >> result && unset count_filename && unset count_fileline;fi; #unset count_filename and count_fileline variables in every loop so that they are not remembered in the next loop. 
+   # Clean the PuzzleDir
+   if [ -d "/home/jovyan/ps1b-lixizoe/PuzzleDir" ];then rm -r PuzzleDir;fi;
+done
+cat result;rm result; # remove the result after running so that the result file won't build up when I run next time. 
+
+
